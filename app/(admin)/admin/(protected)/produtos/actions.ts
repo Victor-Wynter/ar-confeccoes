@@ -34,6 +34,8 @@ export async function createProduct(raw: unknown) {
       .returning({ id: products.id });
 
     revalidatePath("/admin/produtos");
+    revalidatePath("/");
+    revalidatePath("/produtos");
     return { ok: true, productId: product.id };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Erro ao criar produto.";
@@ -62,6 +64,8 @@ export async function updateProduct(id: number, raw: unknown) {
 
     revalidatePath("/admin/produtos");
     revalidatePath(`/admin/produtos/${id}`);
+    revalidatePath("/");
+    revalidatePath("/produtos");
     return { ok: true };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Erro ao atualizar produto.";
@@ -74,6 +78,8 @@ export async function toggleProductActive(id: number, active: boolean) {
   try {
     await db.update(products).set({ active, updatedAt: new Date() }).where(eq(products.id, id));
     revalidatePath("/admin/produtos");
+    revalidatePath("/");
+    revalidatePath("/produtos");
     return { ok: true };
   } catch {
     return { ok: false, error: "Erro ao atualizar produto." };
