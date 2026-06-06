@@ -36,6 +36,7 @@ export async function createProduct(raw: unknown) {
     revalidatePath("/admin/produtos");
     revalidatePath("/");
     revalidatePath("/produtos");
+    revalidatePath("/sitemap.xml");
     return { ok: true, productId: product.id };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Erro ao criar produto.";
@@ -66,6 +67,7 @@ export async function updateProduct(id: number, raw: unknown) {
     revalidatePath(`/admin/produtos/${id}`);
     revalidatePath("/");
     revalidatePath("/produtos");
+    revalidatePath("/sitemap.xml");
     return { ok: true };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Erro ao atualizar produto.";
@@ -80,6 +82,7 @@ export async function toggleProductActive(id: number, active: boolean) {
     revalidatePath("/admin/produtos");
     revalidatePath("/");
     revalidatePath("/produtos");
+    revalidatePath("/sitemap.xml");
     return { ok: true };
   } catch {
     return { ok: false, error: "Erro ao atualizar produto." };

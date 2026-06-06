@@ -14,12 +14,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+  ),
   title: {
     default: "AR Confecções de Uniformes",
-    template: "%s | AR Confecções de Uniformes",
+    template: "%s | AR Confecções",
   },
   description:
     "Fábrica de calças de uniforme para construção civil em São Paulo. Brim pesado, faixa refletiva, tamanhos P ao EXG. Atendimento direto pelo WhatsApp.",
+  openGraph: {
+    siteName: "AR Confecções de Uniformes",
+    locale: "pt_BR",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
