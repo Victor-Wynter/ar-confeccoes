@@ -10,6 +10,7 @@ import { Footer } from "@/components/public/footer";
 import { FadeIn } from "@/components/public/fade-in";
 import { ProductCard } from "@/components/public/product-card";
 import { Shield, Eye, Truck, MessageCircle } from "lucide-react";
+import { HeroColorSwitcher } from "@/components/public/hero-color-switcher";
 
 // Revalida a cada hora para featured products refletirem mudanças no admin sem redeploy
 export const revalidate = 3600;
@@ -76,7 +77,7 @@ export default async function HomePage() {
 
       <main className="flex-1">
         {/* ── Hero ───────────────────────────────────────────────── */}
-        <section className="relative bg-primary text-primary-foreground overflow-hidden">
+        <section className="relative bg-primary text-primary-foreground overflow-hidden pb-0">
           {/* Círculos decorativos sutis */}
           <div
             aria-hidden
@@ -91,47 +92,62 @@ export default async function HomePage() {
             className="absolute right-1/3 bottom-0 w-40 h-40 rounded-full bg-accent/10"
           />
 
-          <div className="container mx-auto px-4 py-24 lg:py-36 relative z-10">
-            <div className="max-w-2xl">
-              <p className="text-primary-foreground/60 text-sm font-medium uppercase tracking-widest mb-4">
-                São Paulo · Direto da fábrica
-              </p>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-                Uniformes que duram.
-                <br />
-                <span className="text-accent">Para quem trabalha.</span>
-              </h1>
-              <p className="mt-6 text-lg text-primary-foreground/75 max-w-xl leading-relaxed">
-                Calças brim para construção civil, com e sem faixa refletiva.
-                Atendemos desde 1 peça até grandes lotes para empresas e
-                construtoras.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link
-                  href="/produtos"
-                  className={cn(
-                    buttonVariants({ size: "lg" }),
-                    "bg-white text-primary hover:bg-white/90 font-semibold"
-                  )}
-                >
-                  Ver catálogo
-                </Link>
-                <a
-                  href={`https://wa.me/${PHONE}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    buttonVariants({ size: "lg" }),
-                    "bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 gap-2"
-                  )}
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  Falar no WhatsApp
-                </a>
+          <div className="container mx-auto px-4 py-20 lg:py-28 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-10 items-center">
+              {/* Texto */}
+              <div>
+                <p className="text-primary-foreground/60 text-sm font-medium uppercase tracking-widest mb-4">
+                  São Paulo · Direto da fábrica
+                </p>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
+                  Uniformes que duram.
+                  <br />
+                  <span className="text-accent">Para quem trabalha.</span>
+                </h1>
+                <p className="mt-6 text-lg text-primary-foreground/75 max-w-xl leading-relaxed">
+                  Calças brim para construção civil, com e sem faixa refletiva.
+                  Atendemos desde 1 peça até grandes lotes para empresas e
+                  construtoras.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <Link
+                    href="/produtos"
+                    className={cn(
+                      buttonVariants({ size: "lg" }),
+                      "bg-white text-primary hover:bg-white/90 font-semibold"
+                    )}
+                  >
+                    Ver catálogo
+                  </Link>
+                  <a
+                    href={`https://wa.me/${PHONE}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      buttonVariants({ size: "lg" }),
+                      "bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 gap-2"
+                    )}
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    Falar no WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              {/* Calça 3D + seletor de cores */}
+              <div className="flex justify-center">
+                <HeroColorSwitcher />
               </div>
             </div>
           </div>
         </section>
+
+        {/* ── Faixa refletiva decorativa ─────────────────────────── */}
+        <div aria-hidden className="w-full flex flex-col">
+          <div className="h-3 w-full bg-[#CCFF00]" />
+          <div className="h-2 w-full bg-[#C0C0C0]" />
+          <div className="h-3 w-full bg-[#CCFF00]" />
+        </div>
 
         {/* ── Destaques ──────────────────────────────────────────── */}
         {featuredProducts.length > 0 && (
