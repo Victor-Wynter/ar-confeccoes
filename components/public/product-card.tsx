@@ -26,13 +26,13 @@ export function ProductCard({
       className="group block rounded-xl border bg-card hover:border-primary/30 hover:shadow-sm transition-all overflow-hidden"
     >
       {/* Image */}
-      <div className="relative aspect-[4/5] bg-muted overflow-hidden">
+      <div className="relative aspect-[3/4] bg-[#F5F5F5] overflow-hidden">
         {imgUrl ? (
           <Image
             src={imgUrl}
             alt={imgAlt ?? name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-contain p-4 group-hover:scale-[1.03] transition-transform duration-300"
             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
@@ -41,7 +41,7 @@ export function ProductCard({
           </div>
         )}
         {totalStock === 0 && (
-          <div className="absolute inset-0 bg-black/30 flex items-end p-3">
+          <div className="absolute inset-0 bg-black/20 flex items-end p-3">
             <Badge
               variant="secondary"
               className="text-xs bg-background/90"

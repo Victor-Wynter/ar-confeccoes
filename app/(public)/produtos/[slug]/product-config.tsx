@@ -167,13 +167,13 @@ export function ProductConfig({ product, variants, images }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* ── Image gallery */}
           <div className="space-y-3">
-            <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-muted">
+            <div className="relative aspect-square max-h-[520px] rounded-xl overflow-hidden bg-[#F5F5F5]">
               {displayImages.length > 0 ? (
                 <Image
                   src={displayImages[activeImgIdx]?.url ?? displayImages[0].url}
                   alt={displayImages[activeImgIdx]?.alt ?? product.name}
                   fill
-                  className="object-cover"
+                  className="object-contain p-3 transition-opacity duration-200"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
                 />
@@ -191,7 +191,7 @@ export function ProductConfig({ product, variants, images }: Props) {
                     key={img.id}
                     onClick={() => setActiveImgIdx(idx)}
                     className={cn(
-                      "relative w-16 h-16 rounded-md overflow-hidden shrink-0 border-2 transition-all",
+                      "relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-all bg-[#F5F5F5]",
                       activeImgIdx === idx
                         ? "border-primary"
                         : "border-transparent hover:border-muted-foreground/30"
@@ -201,8 +201,8 @@ export function ProductConfig({ product, variants, images }: Props) {
                       src={img.url}
                       alt={img.alt ?? ""}
                       fill
-                      className="object-cover"
-                      sizes="64px"
+                      className="object-contain p-1.5"
+                      sizes="80px"
                     />
                   </button>
                 ))}
