@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | AR Confecções",
   },
   description:
-    "Fábrica de calças de uniforme para construção civil em São Paulo. Brim pesado, faixa refletiva, tamanhos P ao EXG. Atendimento direto pelo WhatsApp.",
+    "Fábrica de calças de uniforme profissional em São Paulo. Brim pesado, faixa refletiva, tamanhos P ao EXG. Atendimento direto pelo WhatsApp.",
   openGraph: {
     siteName: "AR Confecções de Uniformes",
     locale: "pt_BR",

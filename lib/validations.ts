@@ -37,8 +37,8 @@ export const variantFormSchema = z.object({
     .regex(/^#[0-9A-Fa-f]{6}$/, "Hex inválido. Ex: #1a2b3c"),
   size: z.enum(SIZES, { message: "Tamanho inválido." }),
   hasReflective: z.boolean(),
+  hasSidePocket: z.boolean(),
   stock: z.number({ message: "Informe o estoque." }).int().min(0, "Estoque não pode ser negativo."),
-  sku: z.string().min(1, "SKU obrigatório."),
 });
 export type VariantFormInput = z.infer<typeof variantFormSchema>;
 

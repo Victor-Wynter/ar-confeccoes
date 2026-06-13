@@ -1,3 +1,20 @@
+// Acréscimos fixos de acessórios (em centavos)
+export const REFLECTIVE_PRICE_CENTS = 500; // +R$5
+export const SIDE_POCKET_PRICE_CENTS = 1000; // +R$10
+
+/** Calcula preço final da variante com base nos acessórios selecionados. */
+export function computeVariantPrice(
+  basePriceCents: number,
+  hasReflective: boolean,
+  hasSidePocket: boolean,
+): number {
+  return (
+    basePriceCents +
+    (hasReflective ? REFLECTIVE_PRICE_CENTS : 0) +
+    (hasSidePocket ? SIDE_POCKET_PRICE_CENTS : 0)
+  );
+}
+
 /**
  * Formata centavos (integer) para string BRL.
  * Ex: 4990 → "R$ 49,90"

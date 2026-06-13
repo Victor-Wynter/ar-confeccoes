@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Catálogo | AR Confecções",
   description:
-    "Uniformes de trabalho para construção civil. Calças brim com e sem faixa refletiva.",
+    "Uniformes de trabalho profissionais. Calças brim com e sem faixa refletiva.",
 };
 
 interface Props {
@@ -93,7 +93,7 @@ export default async function ProdutosPage({ searchParams }: Props) {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-primary">Catálogo</h1>
         <p className="text-muted-foreground mt-1">
-          Uniformes profissionais para construção civil
+          Uniformes profissionais de alta resistência
         </p>
       </div>
 

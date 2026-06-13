@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { formatBRL } from "@/lib/format";
+import { formatBRL, computeVariantPrice } from "@/lib/format";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { buttonVariants } from "@/components/ui/button";
 import type { Product, ProductVariant, ProductImage } from "@/db/schema";
@@ -11,6 +11,8 @@ import { MessageCircle, CalendarDays, ShoppingCart } from "lucide-react";
 import { ReservationModal } from "./reservation-modal";
 
 const SIZE_ORDER = ["P", "M", "G", "GG", "EXG"] as const;
+// Tamanhos sob encomenda — não são estoque padrão
+const SPECIAL_ORDER_SIZES = new Set(["P"]);
 
 interface Props {
   product: Product;
@@ -31,9 +33,11 @@ export function ProductConfig({ product, variants, images }: Props) {
     uniqueColors[0]?.color ?? ""
   );
   const [selectedReflective, setSelectedReflective] = useState(false);
+  const [selectedSidePocket, setSelectedSidePocket] = useState(false);
   const [mode, setMode] = useState<"unit" | "lot">("unit");
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [lotQtys, setLotQtys] = useState<Record<string, number>>({});
+  const [unitQty, setUnitQty] = useState(1);
   const [activeImgIdx, setActiveImgIdx] = useState(0);
   const [reserveOpen, setReserveOpen] = useState(false);
 
@@ -46,7 +50,18 @@ export function ProductConfig({ product, variants, images }: Props) {
     };
   }, [variants, selectedColor]);
 
-  // Auto-correct reflective selection when color changes
+  // ── Side pocket options for selected color + reflective
+  const sidePocketOpts = useMemo(() => {
+    const cv = variants.filter(
+      (v) => v.color === selectedColor && v.hasReflective === selectedReflective
+    );
+    return {
+      noPocket: cv.some((v) => !v.hasSidePocket),
+      withPocket: cv.some((v) => v.hasSidePocket),
+    };
+  }, [variants, selectedColor, selectedReflective]);
+
+  // Auto-correct reflective when color changes
   useEffect(() => {
     if (selectedReflective && !reflectiveOpts.withRefl && reflectiveOpts.noRefl) {
       setSelectedReflective(false);
@@ -55,10 +70,25 @@ export function ProductConfig({ product, variants, images }: Props) {
     }
   }, [reflectiveOpts, selectedReflective]);
 
-  // Reset size when color/reflective changes
+  // Auto-correct side pocket when color/reflective changes
+  useEffect(() => {
+    if (selectedSidePocket && !sidePocketOpts.withPocket && sidePocketOpts.noPocket) {
+      setSelectedSidePocket(false);
+    } else if (!selectedSidePocket && !sidePocketOpts.noPocket && sidePocketOpts.withPocket) {
+      setSelectedSidePocket(true);
+    }
+  }, [sidePocketOpts, selectedSidePocket]);
+
+  // Reset size when any option changes
   useEffect(() => {
     setSelectedSize(null);
-  }, [selectedColor, selectedReflective]);
+    setUnitQty(1);
+  }, [selectedColor, selectedReflective, selectedSidePocket]);
+
+  // Reset qty when size changes
+  useEffect(() => {
+    setUnitQty(1);
+  }, [selectedSize]);
 
   // Reset image index when color changes
   useEffect(() => {
@@ -70,9 +100,11 @@ export function ProductConfig({ product, variants, images }: Props) {
     () =>
       variants.filter(
         (v) =>
-          v.color === selectedColor && v.hasReflective === selectedReflective
+          v.color === selectedColor &&
+          v.hasReflective === selectedReflective &&
+          v.hasSidePocket === selectedSidePocket
       ),
-    [variants, selectedColor, selectedReflective]
+    [variants, selectedColor, selectedReflective, selectedSidePocket]
   );
 
   // ── Images: color-specific first, fallback to generic
@@ -93,30 +125,44 @@ export function ProductConfig({ product, variants, images }: Props) {
     [availableVariants, selectedSize]
   );
 
+  // ── Dynamic price based on selected accessories
+  const currentPrice = computeVariantPrice(
+    product.basePrice,
+    selectedReflective,
+    selectedSidePocket
+  );
+
   // ── Lot mode totals
   const lotItemCount = Object.values(lotQtys).reduce((s, q) => s + q, 0);
   const lotTotal = Object.entries(lotQtys).reduce(
-    (s, [, qty]) => s + qty * product.basePrice,
+    (s, [, qty]) => s + qty * currentPrice,
     0
   );
 
   // ── WhatsApp messages
   function buildUnitWA(): string {
     if (!selectedVariant) return "#";
-    const refl = selectedVariant.hasReflective ? " c/ faixa refletiva" : "";
-    const msg = `Olá! Quero comprar:\n\n• 1x ${product.name} — ${selectedVariant.color} Tam.${selectedVariant.size}${refl}\n\nTotal: ${formatBRL(product.basePrice)}`;
+    const extras: string[] = [];
+    if (selectedVariant.hasReflective) extras.push("c/ faixa refletiva");
+    if (selectedVariant.hasSidePocket) extras.push("c/ bolso lateral");
+    const extrasStr = extras.length > 0 ? ` (${extras.join(", ")})` : "";
+    const totalPrice = currentPrice * unitQty;
+    const msg = `Olá! Quero comprar:\n\n• ${unitQty}x ${product.name} — ${selectedVariant.color} Tam.${selectedVariant.size}${extrasStr}\n\nTotal: ${formatBRL(totalPrice)}`;
     return buildWhatsAppLink({ message: msg });
   }
 
   function buildLotWA(): string {
-    const refl = selectedReflective ? " c/ faixa refletiva" : "";
+    const extras: string[] = [];
+    if (selectedReflective) extras.push("c/ faixa refletiva");
+    if (selectedSidePocket) extras.push("c/ bolso lateral");
+    const extrasStr = extras.length > 0 ? ` (${extras.join(", ")})` : "";
     const lines = SIZE_ORDER.map((s) => {
       const qty = lotQtys[s] ?? 0;
       return qty > 0 ? `• ${qty}x Tam.${s}` : null;
     })
       .filter(Boolean)
       .join("\n");
-    const msg = `Olá! Quero fazer um pedido:\n\n${product.name} — ${selectedColor}${refl}\n${lines}\n\nTotal estimado: ${formatBRL(lotTotal)}`;
+    const msg = `Olá! Quero fazer um pedido:\n\n${product.name} — ${selectedColor}${extrasStr}\n${lines}\n\nTotal estimado: ${formatBRL(lotTotal)}`;
     return buildWhatsAppLink({ message: msg });
   }
 
@@ -129,8 +175,9 @@ export function ProductConfig({ product, variants, images }: Props) {
           color: selectedVariant.color,
           size: selectedVariant.size,
           hasReflective: selectedVariant.hasReflective,
+          hasSidePocket: selectedVariant.hasSidePocket,
           qty: 1,
-          unitPriceCents: product.basePrice,
+          unitPriceCents: currentPrice,
         },
       ]
     : [];
@@ -243,7 +290,10 @@ export function ProductConfig({ product, variants, images }: Props) {
             {/* Reflective toggle */}
             {(reflectiveOpts.noRefl || reflectiveOpts.withRefl) && (
               <div className="space-y-2">
-                <p className="text-sm font-medium">Faixa refletiva</p>
+                <p className="text-sm font-medium">
+                  Faixa refletiva{" "}
+                  <span className="text-xs font-normal text-muted-foreground">(+R$5)</span>
+                </p>
                 <div className="flex rounded-lg border overflow-hidden w-fit">
                   <button
                     disabled={!reflectiveOpts.noRefl}
@@ -273,6 +323,42 @@ export function ProductConfig({ product, variants, images }: Props) {
               </div>
             )}
 
+            {/* Side pocket toggle */}
+            {(sidePocketOpts.noPocket || sidePocketOpts.withPocket) && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">
+                  Bolso lateral{" "}
+                  <span className="text-xs font-normal text-muted-foreground">(+R$10)</span>
+                </p>
+                <div className="flex rounded-lg border overflow-hidden w-fit">
+                  <button
+                    disabled={!sidePocketOpts.noPocket}
+                    onClick={() => setSelectedSidePocket(false)}
+                    className={cn(
+                      "px-4 py-1.5 text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed",
+                      !selectedSidePocket
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    Sem bolso
+                  </button>
+                  <button
+                    disabled={!sidePocketOpts.withPocket}
+                    onClick={() => setSelectedSidePocket(true)}
+                    className={cn(
+                      "px-4 py-1.5 text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed",
+                      selectedSidePocket
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    Com bolso
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* ── UNIT MODE */}
             {mode === "unit" && (
               <div className="space-y-4">
@@ -286,52 +372,88 @@ export function ProductConfig({ product, variants, images }: Props) {
                       );
                       const exists = !!variant;
                       const inStock = (variant?.stock ?? 0) > 0;
+                      const isSpecialOrder = SPECIAL_ORDER_SIZES.has(size);
+                      const isOutOfStock = exists && !inStock;
                       return (
-                        <button
-                          key={size}
-                          disabled={!exists}
-                          onClick={() => exists && setSelectedSize(size)}
-                          className={cn(
-                            "w-12 h-12 rounded-md border text-sm font-medium transition-all relative",
-                            !exists && "opacity-25 cursor-not-allowed",
-                            exists &&
-                              selectedSize === size &&
-                              "border-primary bg-primary/10 text-primary",
-                            exists &&
-                              selectedSize !== size &&
-                              inStock &&
-                              "border-border hover:border-primary/40",
-                            exists &&
-                              selectedSize !== size &&
-                              !inStock &&
-                              "border-border opacity-50 hover:border-primary/40"
+                        <div key={size} className="flex flex-col items-center gap-1">
+                          <button
+                            disabled={!exists}
+                            onClick={() => exists && setSelectedSize(size)}
+                            className={cn(
+                              "w-12 h-12 rounded-md border text-sm font-medium transition-all relative overflow-hidden",
+                              !exists && "opacity-20 cursor-not-allowed",
+                              exists &&
+                                selectedSize === size &&
+                                !isOutOfStock &&
+                                "border-primary bg-primary/10 text-primary",
+                              exists &&
+                                selectedSize !== size &&
+                                inStock &&
+                                "border-border hover:border-primary/40",
+                              isOutOfStock &&
+                                selectedSize === size &&
+                                "border-destructive/60 bg-destructive/5 text-destructive/70",
+                              isOutOfStock &&
+                                selectedSize !== size &&
+                                "border-muted-foreground/20 bg-muted text-muted-foreground/60 hover:border-muted-foreground/40"
+                            )}
+                          >
+                            {size}
+                            {isOutOfStock && (
+                              <span
+                                aria-hidden
+                                className="absolute inset-x-0 top-1/2 h-[1.5px] bg-muted-foreground/50 -translate-y-1/2 rotate-[145deg] scale-x-[1.4] pointer-events-none"
+                              />
+                            )}
+                          </button>
+                          {isSpecialOrder && (
+                            <span className="text-[9px] leading-none text-muted-foreground font-medium uppercase tracking-wide">
+                              Encomenda
+                            </span>
                           )}
-                        >
-                          {size}
-                          {exists && !inStock && (
-                            <span
-                              aria-hidden
-                              className="absolute inset-x-1.5 top-1/2 h-px bg-muted-foreground/40 -translate-y-1/2 rotate-[150deg] pointer-events-none"
-                            />
+                          {isOutOfStock && !isSpecialOrder && (
+                            <span className="text-[9px] leading-none text-destructive/70 font-medium uppercase tracking-wide">
+                              Esgotado
+                            </span>
                           )}
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* Stock indicator */}
-                {selectedVariant && (
-                  <p className="text-xs text-muted-foreground">
-                    {selectedVariant.stock > 0
-                      ? `${selectedVariant.stock} unidade${selectedVariant.stock !== 1 ? "s" : ""} disponível${selectedVariant.stock !== 1 ? "is" : ""}`
-                      : "Sem estoque — disponível para reserva"}
-                  </p>
+                {/* Quantity selector (unit mode) */}
+                {selectedVariant && selectedVariant.stock > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-sm font-medium">Quantidade</p>
+                    <div className="flex items-center gap-0 w-fit rounded-lg border overflow-hidden">
+                      <button
+                        type="button"
+                        aria-label="Diminuir quantidade"
+                        disabled={unitQty <= 1}
+                        onClick={() => setUnitQty((q) => Math.max(1, q - 1))}
+                        className="w-10 h-10 flex items-center justify-center text-lg font-medium transition-colors hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        −
+                      </button>
+                      <span className="w-10 h-10 flex items-center justify-center text-sm font-semibold border-x select-none">
+                        {unitQty}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label="Aumentar quantidade"
+                        onClick={() => setUnitQty((q) => q + 1)}
+                        className="w-10 h-10 flex items-center justify-center text-lg font-medium transition-colors hover:bg-muted"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 )}
 
                 {/* Price */}
                 <p className="text-2xl font-bold text-primary">
-                  {formatBRL(product.basePrice)}
+                  {formatBRL(currentPrice * (selectedVariant && selectedVariant.stock > 0 ? unitQty : 1))}
                 </p>
 
                 {/* CTAs */}
@@ -400,9 +522,17 @@ export function ProductConfig({ product, variants, images }: Props) {
                         );
                         if (!variant) return null;
                         const qty = lotQtys[size] ?? 0;
+                        const isSpecialOrder = SPECIAL_ORDER_SIZES.has(size);
                         return (
                           <tr key={size} className="border-t">
-                            <td className="px-4 py-2.5 font-medium">{size}</td>
+                            <td className="px-4 py-2.5 font-medium">
+                              {size}
+                              {isSpecialOrder && (
+                                <span className="ml-1.5 text-[9px] text-muted-foreground font-medium uppercase tracking-wide">
+                                  Encomenda
+                                </span>
+                              )}
+                            </td>
                             <td className="px-4 py-2.5">
                               <input
                                 type="number"
@@ -424,7 +554,7 @@ export function ProductConfig({ product, variants, images }: Props) {
                             </td>
                             <td className="px-4 py-2.5 text-right text-muted-foreground">
                               {qty > 0
-                                ? formatBRL(qty * product.basePrice)
+                                ? formatBRL(qty * currentPrice)
                                 : "—"}
                             </td>
                           </tr>
@@ -472,13 +602,13 @@ export function ProductConfig({ product, variants, images }: Props) {
         </div>
       </div>
 
-      {/* Modal de reserva (Phase 4) */}
+      {/* Modal de reserva */}
       <ReservationModal
         open={reserveOpen}
         onClose={() => setReserveOpen(false)}
         productName={product.name}
         items={reserveItems}
-        totalCents={product.basePrice}
+        totalCents={currentPrice}
       />
     </>
   );

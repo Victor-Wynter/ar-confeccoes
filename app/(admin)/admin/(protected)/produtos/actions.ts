@@ -121,7 +121,7 @@ export async function createVariant(productId: number, raw: unknown) {
     return { ok: true };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Erro ao criar variante.";
-    if (msg.includes("unique")) return { ok: false, error: "SKU ou combinação cor/tamanho/refletiva já existe." };
+    if (msg.includes("unique")) return { ok: false, error: "Combinação cor/tamanho/refletiva/bolso já existe." };
     return { ok: false, error: msg };
   }
 }

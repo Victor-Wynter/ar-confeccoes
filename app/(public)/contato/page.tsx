@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { MessageCircle, Clock, MapPin, Mail } from "lucide-react";
+import { MessageCircle, MapPin, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -36,15 +36,8 @@ const CONTACTS = [
     cta: undefined,
     target: undefined,
   },
-  {
-    icon: Clock,
-    label: "Horário",
-    value: "Segunda a Sábado, 8h às 17h",
-    href: undefined,
-    cta: undefined,
-    target: undefined,
-  },
 ] as const;
+
 
 export default function ContatoPage() {
   return (

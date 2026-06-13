@@ -11,7 +11,7 @@ export function Footer() {
           <div className="space-y-2">
             <h3 className="font-bold text-primary">AR Confecções</h3>
             <p className="text-muted-foreground text-xs leading-relaxed">
-              Fabricante de uniformes profissionais para construção civil,
+              Fabricante de uniformes profissionais,
               direto de São Paulo.
             </p>
           </div>

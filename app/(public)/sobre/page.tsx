@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Sobre | AR Confecções",
   description:
-    "Conheça a AR Confecções de Uniformes — fabricante de calças brim para construção civil em São Paulo.",
+    "Conheça a AR Confecções de Uniformes — fabricante de calças brim profissionais em São Paulo.",
 };
 
 const PHONE = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
@@ -18,7 +18,7 @@ export default function SobrePage() {
       <div>
         <h1 className="text-3xl font-bold text-primary">Sobre a AR Confecções</h1>
         <p className="text-muted-foreground mt-2">
-          Fabricante de uniformes profissionais para construção civil
+          Fabricante de uniformes profissionais de alta durabilidade
         </p>
       </div>
 
@@ -32,13 +32,13 @@ export default function SobrePage() {
         </div>
         <p className="text-muted-foreground leading-relaxed">
           A AR Confecções de Uniformes é uma fabricante paulistana especializada
-          em calças de trabalho para o setor de construção civil. Produzimos com
+          em calças de trabalho. Produzimos com
           tecido brim pesado de alta resistência, indicado para ambientes
           exigentes e jornadas longas.
         </p>
         <p className="text-muted-foreground leading-relaxed">
           Nossa linha inclui calças com e sem faixa refletiva, atendendo tanto
-          trabalhadores individuais quanto empresas e construtoras que necessitam
+          trabalhadores individuais quanto empresas e comércios que necessitam
           de uniformes em quantidade.
         </p>
       </section>
@@ -54,7 +54,7 @@ export default function SobrePage() {
         <p className="text-muted-foreground leading-relaxed">
           Trabalhamos com brim 100% algodão e brim misto, selecionados por
           gramatura e resistência ao desgaste. As faixas refletivas atendem aos
-          requisitos de alta visibilidade para ambientes de obra, garantindo mais
+          requisitos de alta visibilidade para ambientes de trabalho, garantindo mais
           segurança ao trabalhador.
         </p>
         <p className="text-muted-foreground leading-relaxed">
@@ -72,12 +72,12 @@ export default function SobrePage() {
           <h2 className="text-xl font-semibold">Atendimento direto</h2>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          O Amilton atende pessoalmente cada cliente via WhatsApp. Sem
+          Atendemos pessoalmente cada cliente via WhatsApp. Sem
           intermediários — você fala direto com quem fabrica. Isso garante
           respostas rápidas, negociação transparente e agilidade na entrega.
         </p>
         <p className="text-muted-foreground leading-relaxed">
-          Para pedidos em lote (empresas, construtoras, empreiteiras),
+          Para pedidos em lote (empresas, indústrias, comércios),
           negociamos prazo, volume e condições diretamente.
         </p>
       </section>

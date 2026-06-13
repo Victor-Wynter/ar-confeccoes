@@ -29,7 +29,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Check } from "lucide-react";
+
+const PRESET_COLORS = [
+  { label: "Azul Royal",   hex: "#2650C1" },
+  { label: "Azul Marinho", hex: "#0C1F5E" },
+  { label: "Preto",        hex: "#111111" },
+  { label: "Cinza",        hex: "#6B7280" },
+  { label: "Laranja",      hex: "#E05A00" },
+  { label: "Marrom",       hex: "#6B3A2A" },
+] as const;
 
 export function VariantsTab({
   productId,
@@ -51,17 +60,24 @@ export function VariantsTab({
   } = useForm<VariantFormInput>({
     resolver: zodResolver(variantFormSchema),
     defaultValues: {
-      color: "",
-      colorHex: "#000000",
+      color: "Azul Royal",
+      colorHex: "#2650C1",
       size: "M",
       hasReflective: false,
+      hasSidePocket: false,
       stock: 0,
-      sku: "",
     },
   });
 
   const size = watch("size");
   const hasReflective = watch("hasReflective");
+  const hasSidePocket = watch("hasSidePocket");
+  const color = watch("color");
+
+  function selectColor(preset: (typeof PRESET_COLORS)[number]) {
+    setValue("color", preset.label, { shouldValidate: true });
+    setValue("colorHex", preset.hex, { shouldValidate: true });
+  }
 
   function onSubmit(data: VariantFormInput) {
     startTransition(async () => {
@@ -105,7 +121,7 @@ export function VariantsTab({
                 <TableHead>Cor</TableHead>
                 <TableHead>Tam.</TableHead>
                 <TableHead>Refletiva</TableHead>
-                <TableHead>SKU</TableHead>
+                <TableHead>Bolso</TableHead>
                 <TableHead>Estoque</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
@@ -134,7 +150,16 @@ export function VariantsTab({
                       <span className="text-muted-foreground text-sm">Não</span>
                     )}
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{v.sku}</TableCell>
+                  <TableCell>
+                    {v.hasSidePocket ? (
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-200" variant="outline">
+                        Sim
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Não</span>
+                    )}
+                  </TableCell>
+
                   <TableCell>
                     <Input
                       type="number"
@@ -174,25 +199,52 @@ export function VariantsTab({
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <Label>Cor *</Label>
-                  <Input placeholder="Azul" {...register("color")} />
-                  {errors.color && <p className="text-xs text-destructive">{errors.color.message}</p>}
+              <div className="space-y-2">
+                <Label>Cor *</Label>
+                <div className="flex flex-wrap gap-2">
+                  {PRESET_COLORS.map((preset) => {
+                    const isSelected = color === preset.label;
+                    return (
+                      <button
+                        key={preset.hex}
+                        type="button"
+                        title={preset.label}
+                        onClick={() => selectColor(preset)}
+                        className="group relative flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all"
+                        style={{
+                          borderColor: isSelected ? preset.hex : undefined,
+                          backgroundColor: isSelected ? `${preset.hex}12` : undefined,
+                        }}
+                      >
+                        <span
+                          className="w-5 h-5 rounded-full border border-black/10 shrink-0 flex items-center justify-center"
+                          style={{ backgroundColor: preset.hex }}
+                        >
+                          {isSelected && (
+                            <Check
+                              className="w-3 h-3"
+                              style={{ color: preset.hex === "#111111" || preset.hex === "#0C1F5E" ? "#fff" : "#fff" }}
+                            />
+                          )}
+                        </span>
+                        <span className={isSelected ? "font-semibold" : "text-muted-foreground"}>
+                          {preset.label}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Hex da cor *</Label>
-                  <div className="flex gap-2">
-                    <input
-                      type="color"
-                      className="h-9 w-9 rounded border cursor-pointer p-0.5 shrink-0"
-                      {...register("colorHex")}
-                      onChange={(e) => setValue("colorHex", e.target.value)}
-                    />
-                    <Input placeholder="#1a2b3c" {...register("colorHex")} className="font-mono" />
-                  </div>
-                  {errors.colorHex && <p className="text-xs text-destructive">{errors.colorHex.message}</p>}
-                </div>
+                {/* Campos hidden para o RHF */}
+                <input type="hidden" {...register("color")} />
+                <input type="hidden" {...register("colorHex")} />
+                {(errors.color || errors.colorHex) && (
+                  <p className="text-xs text-destructive">
+                    {errors.color?.message ?? errors.colorHex?.message}
+                  </p>
+                )}
+              </div>
+              {/* Linha 2: Tamanho + Estoque */}
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label>Tamanho *</Label>
                   <Select value={size} onValueChange={(v) => setValue("size", v as typeof size)}>
@@ -207,22 +259,31 @@ export function VariantsTab({
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>SKU *</Label>
-                  <Input placeholder="BRIM-AZ-M" className="font-mono" {...register("sku")} />
-                  {errors.sku && <p className="text-xs text-destructive">{errors.sku.message}</p>}
-                </div>
-                <div className="space-y-1.5">
                   <Label>Estoque</Label>
                   <Input type="number" min="0" {...register("stock", { valueAsNumber: true })} />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Faixa refletiva</Label>
-                  <div className="flex items-center gap-2 h-9">
-                    <Switch
-                      checked={hasReflective}
-                      onCheckedChange={(v) => setValue("hasReflective", v)}
-                    />
-                    <span className="text-sm">{hasReflective ? "Sim" : "Não"}</span>
+              </div>
+
+              {/* Linha 3: Toggles */}
+              <div className="flex flex-wrap gap-4">
+                <div className="flex items-center gap-3 rounded-lg border px-4 py-3 flex-1 min-w-40">
+                  <Switch
+                    checked={hasReflective}
+                    onCheckedChange={(v) => setValue("hasReflective", v)}
+                  />
+                  <div>
+                    <p className="text-sm font-medium">Faixa refletiva</p>
+                    <p className="text-xs text-muted-foreground">{hasReflective ? "Com faixa" : "Sem faixa"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 rounded-lg border px-4 py-3 flex-1 min-w-40">
+                  <Switch
+                    checked={hasSidePocket}
+                    onCheckedChange={(v) => setValue("hasSidePocket", v)}
+                  />
+                  <div>
+                    <p className="text-sm font-medium">Bolso lateral</p>
+                    <p className="text-xs text-muted-foreground">{hasSidePocket ? "Com bolso" : "Sem bolso"}</p>
                   </div>
                 </div>
               </div>

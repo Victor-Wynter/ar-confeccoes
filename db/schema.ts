@@ -35,9 +35,9 @@ export const productVariants = pgTable(
     color: text("color").notNull(),
     colorHex: text("color_hex").notNull(),
     size: text("size").notNull(),
-    hasReflective: boolean("has_reflective").notNull(),
+    hasReflective: boolean("has_reflective").notNull().default(false),
+    hasSidePocket: boolean("has_side_pocket").notNull().default(false),
     stock: integer("stock").notNull().default(0),
-    sku: text("sku").notNull().unique(),
   },
   (t) => [
     uniqueIndex("uniq_variant").on(
@@ -45,6 +45,7 @@ export const productVariants = pgTable(
       t.color,
       t.size,
       t.hasReflective,
+      t.hasSidePocket,
     ),
     index("variants_product_idx").on(t.productId),
   ],
@@ -68,6 +69,7 @@ export type ReservationItem = {
   color: string;
   size: string;
   hasReflective: boolean;
+  hasSidePocket: boolean;
   qty: number;
   unitPriceCents: number;
 };

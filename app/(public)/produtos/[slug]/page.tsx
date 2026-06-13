@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${row.name} | AR Confecções`;
   const description =
     row.description ??
-    `${row.name} — uniforme profissional para construção civil. Com e sem faixa refletiva.`;
+    `${row.name} — uniforme profissional. Com e sem faixa refletiva.`;
 
   return {
     title,

@@ -8,6 +8,20 @@
       "when": 1779885179636,
       "tag": "0000_special_puppet_master",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781027790345,
+      "tag": "0001_blue_amazoness",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781371258559,
+      "tag": "0002_busy_wind_dancer",
+      "breakpoints": true
     }
   ]
 }

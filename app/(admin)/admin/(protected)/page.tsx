@@ -167,7 +167,7 @@ export default async function AdminDashboardPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Package className="h-4 w-4 mt-0.5 text-primary shrink-0" />
-                  <span><strong className="text-foreground">Variantes</strong> — combinações de cor + tamanho + faixa refletiva, cada uma com SKU e estoque próprio.</span>
+                  <span><strong className="text-foreground">Variantes</strong> — combinações de cor + tamanho + faixa refletiva, cada uma com estoque próprio.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <ImageIcon className="h-4 w-4 mt-0.5 text-primary shrink-0" />

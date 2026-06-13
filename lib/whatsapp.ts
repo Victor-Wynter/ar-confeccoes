@@ -44,6 +44,7 @@ export interface ReservationMessageParams {
     color: string;
     size: string;
     hasReflective: boolean;
+    hasSidePocket: boolean;
     qty: number;
     unitPriceCents: number;
   }>;
@@ -67,13 +68,16 @@ export function buildReservationMessage(p: ReservationMessageParams): string {
   lines.push(`*Itens:*`);
 
   for (const item of p.items) {
-    const reflective = item.hasReflective ? " c/ refletiva" : "";
+    const extras: string[] = [];
+    if (item.hasReflective) extras.push("c/ refletiva");
+    if (item.hasSidePocket) extras.push("c/ bolso lateral");
+    const extrasStr = extras.length > 0 ? ` ${extras.join(", ")}` : "";
     const unit = (item.unitPriceCents / 100).toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
     });
     lines.push(
-      `• ${item.qty}x ${item.productName} — ${item.color} Tam.${item.size}${reflective} (${unit}/un)`
+      `• ${item.qty}x ${item.productName} — ${item.color} Tam.${item.size}${extrasStr} (${unit}/un)`
     );
   }
 

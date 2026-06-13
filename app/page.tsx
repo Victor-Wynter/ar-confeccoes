@@ -18,7 +18,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "AR Confecções de Uniformes — Direto da fábrica",
   description:
-    "Calças de brim para construção civil, com e sem faixa refletiva. Fabricado em SP, entregamos para todo o Brasil.",
+    "Calças de brim profissionais, com e sem faixa refletiva. Fabricado em SP, entregamos para todo o Brasil.",
 };
 
 const PHONE = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
@@ -27,12 +27,12 @@ const WHY_AR = [
   {
     icon: Shield,
     title: "Qualidade profissional",
-    desc: "Tecido brim pesado, resistente e durável para uso intenso em obras e canteiros.",
+    desc: "Tecido brim pesado, resistente e durável para uso intenso no dia a dia de trabalho.",
   },
   {
     icon: Eye,
     title: "Faixa refletiva",
-    desc: "Disponível com faixa de alta visibilidade — essencial para obras e ambientes noturnos.",
+    desc: "Disponível com faixa de alta visibilidade — essencial para ambientes de trabalho e noturnos.",
   },
   {
     icon: Truck,
@@ -105,17 +105,14 @@ export default async function HomePage() {
                   <span className="text-accent">Para quem trabalha.</span>
                 </h1>
                 <p className="mt-6 text-lg text-primary-foreground/75 max-w-xl leading-relaxed">
-                  Calças brim para construção civil, com e sem faixa refletiva.
-                  Atendemos desde 1 peça até grandes lotes para empresas e
-                  construtoras.
+                  Calças brim profissionais, com e sem faixa refletiva.
+                  Atendemos desde 1 peça até grandes lotes para diversos segmentos e
+                  empresas.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link
                     href="/produtos"
-                    className={cn(
-                      buttonVariants({ size: "lg" }),
-                      "bg-white text-primary hover:bg-white/90 font-semibold"
-                    )}
+                    className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-white bg-white px-5 text-sm font-semibold text-primary shadow-sm transition-all duration-200 hover:bg-transparent hover:text-white hover:shadow-none active:translate-y-px"
                   >
                     Ver catálogo
                   </Link>
@@ -159,7 +156,7 @@ export default async function HomePage() {
                     Produtos em destaque
                   </h2>
                   <p className="text-muted-foreground mt-2">
-                    Os mais pedidos pelas obras
+                    Os mais pedidos para o trabalho
                   </p>
                 </div>
               </FadeIn>
@@ -232,7 +229,7 @@ export default async function HomePage() {
                   Precisa de uniforme em quantidade?
                 </h2>
                 <p className="text-muted-foreground mt-3 max-w-xl mx-auto leading-relaxed">
-                  Atendemos empresas, construtoras e empreiteiras. Negociamos
+                  Atendemos empresas, indústrias e diversos setores. Negociamos
                   volume, prazo de entrega e condições de pagamento diretamente
                   com você.
                 </p>

@@ -16,6 +16,7 @@ import { formatBRL } from "@/lib/format";
 import { buttonVariants } from "@/components/ui/button";
 import { ProductsSearch } from "./products-search";
 import { ProductActiveToggle } from "./product-active-toggle";
+import { ProductDeleteButton } from "./product-delete-button";
 
 export const metadata = { title: "Produtos | Admin" };
 
@@ -74,6 +75,7 @@ export default async function ProdutosPage({ searchParams }: Props) {
                 <TableHead className="hidden md:table-cell">Variantes</TableHead>
                 <TableHead>Ativo</TableHead>
                 <TableHead className="w-10" />
+                <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -107,6 +109,9 @@ export default async function ProdutosPage({ searchParams }: Props) {
                     >
                       <Pencil className="h-4 w-4" />
                     </Link>
+                  </TableCell>
+                  <TableCell>
+                    <ProductDeleteButton id={p.id} name={p.name} />
                   </TableCell>
                 </TableRow>
               ))}
